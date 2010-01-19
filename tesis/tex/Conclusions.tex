@@ -1,0 +1,72 @@
+\chapter{Conclusions and Future Work}
+\label{sec:conclusions}
+
+The new multi-stage algorithm proposed here has good performance in
+very dynamic environments. It behaves particularly well when several small
+obstacles are moving around at random. This is explained by the fact
+that if the obstacles are constantly moving, they will sometimes move out of the
+way by themselves, which our algorithm takes advantage of, while RRT based
+ones do not, they just drop branches of the tree that could prove useful
+again just a few moments later. The combined \mbox{RRT-EP/N}, although having more
+operators, and automatic adjustment of the operator probabilities according to
+their effectiveness, is still better than the RRT variants, but about 55\% 
+slower than the
+simple multi-stage algorithm. This is explained by the number of collision
+checks performed, more than twice than the multi-stage algorithm, because
+collision checks must be performed for the entire population, not just a single
+path.
+
+In the partially known environment, even though the difference in collision checks
+is even greater than in dynamic environments, the RRT-EP/N performance is
+about 25\% worse than the multi-stage algorithm. Overall, the RRT variants
+are closer to the performance of both combined algorithms.
+
+In the totally unknown environment, the combined RRT-EP/N is about 30\% faster
+than the simple multi-stage algorithm, and both outperform the RRT variants,
+with much smaller times and standard deviations.
+
+All things considered, the simple multi-stage algorithm is the best choice in
+most situations, with
+faster and more predictable planning times, a higher success
+rate, fewer collision checks performed and, above all, a much simpler
+implementation than all the other algorithms compared.
+
+This thesis shows that a multi-stage approach, using different techniques for
+initial plannning and navigation, outperforms current probabilistic sampling
+techniques in dynamic, partially known and unknown environments.
+
+Part of the results presented in this thesis are published in \cite{Barriga09}.
+
+\section{Future Work}
+We propose several areas of improvement for the work presented in this thesis.
+\subsection{Algorithms}
+The most promising area of improvement seems to be to experiment with different on-line planners
+such as a version of the
+EvP (\cite{Alfaro05} and~\cite{Alfaro08}) modified to work in
+continuous configuration space or a potential field navigator. Also, the local
+search presented here could benefit from the use of more sophisticated
+operators and the parameters for the RRT variants (such as forest size for
+MP-RRT),
+and the EP/N (such as population size) could benefit from being tuned specifically for this
+implementation, and not simply reusing the parameters found in previous work.
+
+Another area of research that could be tackled is extending this algorithm to
+higher dimensional problems, as RRT variants
+are known to work well in higher dimensions.
+
+Finally, as RRT variants are suitable for kinodynamic planning, we only need to adapt
+the on-line stage of the algorithm to have a new multi-stage planner for problems
+with kinodynamic constraints.
+\subsection{Framework}
+The MoPa framework could benefit from the integration of a third party logic
+layer, with support for arbitrary geometrical shapes, a spatial scene graph and
+hierarchical maps. Some candidates would be
+OgreODE~\cite{OgreODE}, Spring
+RTS~\cite{SpringRTS} and
+ORTS~\cite{ORTS}.
+
+Other possible improvements are adding support for other map formats, including
+discrimination of static and moving obstacles, limited
+sensor range simulation and integration with external hardware such as the Lego
+NXT~\cite{LegoNXT}, to run experiments in a more
+realistic scenario.

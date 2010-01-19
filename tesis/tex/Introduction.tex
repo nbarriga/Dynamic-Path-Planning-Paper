@@ -1,0 +1,119 @@
+\chapter{Introduction}
+The \emph{dynamic path-planning} problem consists in finding a suitable
+plan for each new configuration of the environment by recomputing a
+collision-free path using the new information available at each time step~\cite{Hwang92}.
+This kind of problem has to be solved for example by a robot trying to navigate
+through an area crowded with people, such as a shopping mall or supermarket.
+The problem has been widely addressed in its several flavors,
+such as cellular decomposition of the configuration space~\cite{Stentz95},
+partial environmental knowledge~\cite{Stentz94},
+high-dimensional configuration spaces~\cite{Kavraki96}
+or planning with non-holonomic constraints~\cite{Lavalle99}.
+However, even simpler variations of this problem are complex enough
+that they can not be solved
+with deterministic techniques, and therefore are worthy of study.
+
+This thesis is focused on algorithms for
+finding and traversing a collision-free path in
+two dimensional space, for a
+holonomic robot\footnote{A holonomic robot is a robot in
+which the controllable degrees of freedom is equal to the total degrees of
+freedom.},
+without kinodynamic restrictions\footnote{Kinodynamic planning is a problem in which velocity and acceleration
+bounds must be satisfied}, in a highly dynamic environment, but for comparison
+purposes three different scenarios will be tested:
+\begin{itemize}
+\item Several unpredictably moving obstacles or adversaries.
+\item Partially known environment, where some obstacles become visible when the
+robot approaches each one of them.
+\item Totally unknown environment, where every obstacle is initially invisible
+to the planner, and only becomes visible when the robot approaches it.
+\end{itemize}
+Besides the obstacles in the second and third scenario we assume
+that we have perfect information of the environment at all times.
+
+We will focus on continuous space algorithms and
+will not consider algorithms that use a discretized representation of the
+configuration space\footnote{the space of possible positions that a physical
+system may attain}, such
+as D*~\cite{Stentz95},
+because for high dimensional problems the
+configuration space becomes intractable in terms of both memory and computation
+time, and there is the extra difficulty of calculating the discretization size,
+trading off accuracy versus computational cost.
+Only single agent algorithms will be considered here.
+On-line as well as off-line algorithms will be studied. An on-line algorithm is
+one that is permanently adjusting its solution as the environment changes, while
+an off-line algorithm computes a solution only once (however, it can be executed 
+many times).
+
+The offline Rapidly-Exploring Random Tree (RRT) is efficient at finding solutions, but the results are far from
+optimal, and must be post-processed for shortening, smoothing or other qualities
+that might be desirable in each particular problem. Furthermore, replanning RRTs
+are costly in terms of computation time, as are evolutionary and cell-decomposition
+approaches. Therefore, the novelty of this work is
+the mixture of the feasibility benefits of the RRTs, the repairing capabilities
+of local search, and the computational inexpensiveness of greedy algorithms,
+into our lightweight multi-stage algorithm. Our working hypothesis will be that
+a multi-stage algorithm, using different techniques for initial planning and
+navigation,
+outperforms current probabilistic sampling techniques in highly dynamic
+environments
+
+\section{Problem Formulation}
+
+At each time-step, the problem could be defined as
+an optimization problem with satisfiability constraints.
+Therefore, given a path our objective is to minimize an evaluation function
+(i.e., distance, time, or path-points), with the \(C_{\text{free}}\) constraint.
+Formally, let the path \mbox{$\rho=p_1p_2\ldots p_n$} be a sequence of points, where
+\mbox{$p_i \in \mathbb{R}^n$} is a $n$-dimensional point (\mbox{\(p_1 = q_{\text{init}}, p_n =
+q_{\text{goal}}\)}),
+$O_t\in \mathcal{O} $ the set of obstacles positions
+at time $t$, and \mbox{$\operatorname{eval} \colon \mathbb{R}^n \times
+\mathcal{O} \mapsto \mathbb{R}$}
+an evaluation function of the path depending on the object positions.
+Our ideal objective is to obtain the optimum $\rho^*$ path that
+minimizes our $\operatorname{eval}$ function within a feasibility restriction in the form
+\begin{equation}
+\displaystyle\rho^*=\underset{\rho}{\operatorname{argmin}}[\operatorname{eval}(\rho,O_t)]  \textrm{ with }
+\operatorname{feas}(\rho,O_t) = C_{\text{free}}
+\label{eq:problem}
+\end{equation}
+where \(\operatorname{feas}(\cdot,\cdot)\) is a \emph{feasibility} function that equals
+\(C_{\text{free}}\)
+if the path $\rho$ is collision free for the obstacles $O_t$.
+For simplicity, we use very naive \(\operatorname{eval}(\cdot,\cdot)\) and
+\(\operatorname{feas}(\cdot,\cdot)\)
+functions, but our approach could be extended easily to more complex evaluation and
+feasibility functions.
+The \(\operatorname{feas}(\rho,O_t)\) function used assumes that the robot is a point
+object in space, and therefore if no segments
+\(\overrightarrow{p_i p_{i+1}}\)
+of the path collide with any object \(o_j \in O_t\), we say that the path
+is in \(C_{\text{free}}\).
+The \(\operatorname{eval}(\rho,O_t)\) function is the length of the path, i.e., the sum of the distances between
+consecutive points. This could be easily changed to any other metric such as the time
+it would take to traverse this path, accounting for smoothness,
+clearness or several other optimization criteria.
+
+\section{Document Structure}
+
+In the following sections we present several path planning methods that can be
+applied to the problem described above. In section~\ref{sec:RRT} we review
+the basic offline, single-query RRT, a probabilistic method that builds a
+tree along the free configuration space until it reaches the goal state.
+Afterwards, we introduce the most popular replanning variants of
+RRT: Execution Extended RRT (ERRT) in section~\ref{sec:ERRT}, Dynamic RRT (DRRT) in
+section~\ref{sec:DRRT} and Multipartite RRT (MP-RRT) in section~\ref{sec:MPRRT}.
+The Evolutionary Planner/Navigator (EP/N), along with some variants, is presented
+in section~\ref{sec:EP/N}.
+Then, in section~\ref{sec:RRT-EP/N} we present a mixed approach, using a RRT to
+find an initial solution and the EP/N to navigate, and finally, in section~\ref{sec:RRT-LP} we
+present our new hybrid multi-stage algorithm, that uses RRT for initial
+planning and informed local search for navigation, plus a simple greedy
+heuristic for optimization. Experimental results and
+comparisons that show that this combination of simple techniques provides better
+responses to highly dynamic environments than the standard RRT extensions are
+presented in section~\ref{sec:results}. The
+conclusions and further work are discussed in section~\ref{sec:conclusions}.
